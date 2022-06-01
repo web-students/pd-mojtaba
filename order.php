@@ -26,6 +26,8 @@ if (isset($_SESSION['login']) && $_SESSION['login']) {
             // --- Empty Shopcart ---
             $_SESSION['shopcart'] = array();
 
+            header("location: order.php");
+
             print "سفارش شما با موفقیت ثبت شد!";
         } else {
             print "خطا در ثبت سفارش!";
@@ -45,30 +47,31 @@ if (isset($_SESSION['login']) && $_SESSION['login']) {
             $status = $statuses[$order['status']];
             //order details
             $details_query = mysqli_query($link, "SELECT od.*, p.name FROM order_details as od LEFT JOIN products as p ON p.code=od.pid WHERE od.oid='$oid' ");
-        }
+        
 
-        $products = '';
-        $total_price = 0;
-        // ############## Print Product ##############
-        while ($details = mysqli_fetch_array($details_query)) {
-            $products .= "
-                <div id='orders-product'>
-                    <div class='orders-product-name'>{$details['name']}</div>
-                    <div class='orders-product-qty'>{$details['qty']}</div>
-                    <div class='orders-product-price'>" . number_format($details['price']) . " تومان </div>
-                </div>";
-            $total_price += $details['price'] * $details['qty'];
+            $products = '';
+            $total_price = 0;
+            // ############## Print Product ##############
+            while ($details = mysqli_fetch_array($details_query)) {
+                $products .= "
+                    <div id='orders-product'>
+                        <div class='orders-product-name'>{$details['name']}</div>
+                        <div class='orders-product-qty'>{$details['qty']}</div>
+                        <div class='orders-product-price'>" . number_format($details['price']) . " تومان </div>
+                    </div>";
+                $total_price += $details['price'] * $details['qty'];
+            }
+            // ############## Print Order ##############
+            print "<div id='orders-container'>
+                        <div id='orders'>
+                            <p class='orders-code'>کد سفارش: $oid</p>
+                            <p class='orders-date'> تاریخ: $date</p>
+                            <p class='orders-status'> وضعیت: $status</p>
+                            <p class='orders-price'>مبلغ سفارش : " . number_format($total_price) . " تومان </p>
+                            $products
+                        </div>
+                    </div>";
         }
-        // ############## Print Order ##############
-        print "<div id='orders-container'>
-                    <div id='orders'>
-                        <p class='orders-code'>کد سفارش: $oid</p>
-                        <p class='orders-date'> تاریخ: $date</p>
-                        <p class='orders-status'> وضعیت: $status</p>
-                        <p class='orders-price'>مبلغ سفارش : " . number_format($total_price) . " تومان </p>
-                        $products
-                    </div>
-                </div>";
     } else {
         print "<p>سفارشی وجود ندارد </p>";
     }
